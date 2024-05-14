@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
 
 @Service
 @Data
@@ -39,7 +39,7 @@ public class ConverterHexa {
     private String hexRequestAuthenticator;
 
 
-    // Método para construir el mensaje completo en hexadecimal
+    /** Método para construir el mensaje completo en hexadecimal */
     public String completeMessage(String userName, String user, String  Password, String ip, String version, String requestAuthentication, String nasIp, String nasPort) throws UnsupportedEncodingException {
 
         // Verifica si cada valor ya está en hexadecimal, si no se convierte a hexa
@@ -50,15 +50,15 @@ public class ConverterHexa {
         hexRequestAuthenticator = isHexadecimal(requestAuthentication) ? requestAuthentication : getRequestAuthenticatorHex(requestAuthentication);
 
         // Concatena todas las partes del mensaje
-        String completeMessage = code_AccessRequest + ID + "??" + hexRequestAuthenticator.replace(" ", "") +  hexUserName +  hexUserPassword + hexNasIp +  hexNasPort;
+        String completeMessage = code_AccessRequest + ID + "????" + hexRequestAuthenticator.replace(" ", "") +  hexUserName +  hexUserPassword + hexNasIp +  hexNasPort;
 
-        // Calcula la longitud total del mensaje en bytes y le suma 2 bytes q es la longitud de los 2 bytes de la longitud total
-        int totalLength = (completeMessage.length() / 2)+2;
+        // Calcula la longitud total del mensaje en bytes
+        int totalLength = (completeMessage.length() / 2);
         // Convierte la longitud a formato hexadecimal ( esta longitud a diferencia de las otras es de 4 bytes
         String totalLengthHex = String.format("%04x", totalLength);
 
         // Reemplaza los signos de interrogación con la longitud total del mensaje (ya que la longitud se calcula después de convertir a hexa)
-        completeMessage = completeMessage.replace("??", totalLengthHex);
+        completeMessage = completeMessage.replace("????", totalLengthHex);
 
         // Formatea el mensaje completo separado de a 2 bytes
         completeMessage = formatMessage(completeMessage);
@@ -76,7 +76,7 @@ public class ConverterHexa {
 
 
 
-    // Verifica si una cadena está en hexadecimal
+    /** Verifica si una cadena está en hexadecimal */
     private boolean isHexadecimal(String str) {
         // Elimina los espacios de la cadena antes de verificar si es hexadecimal
         String strWithoutSpaces = str.replace(" ", "");
@@ -93,7 +93,7 @@ public class ConverterHexa {
     }
 
 
-    // Convierte un String a hexa
+    /** Convierte un String a hexa */
     public String convertToHex(String message) throws UnsupportedEncodingException {
         if (message.matches("\\d+")) {
             // Si el mensaje es un número, conviértelo a long y luego a hexadecimal
@@ -106,7 +106,7 @@ public class ConverterHexa {
     }
 
 
-    // Convierte una dirección IP a hexadecimal
+    /** Convierte una dirección IP a hexadecimal */
     public String convertIpToHex(String ip) {
         if (IP_PATTERN.matcher(ip).matches()) { // Verifica si la entrada es una dirección IP válida
             StringBuilder hexIp = new StringBuilder();
@@ -115,24 +115,24 @@ public class ConverterHexa {
                 hexIp.append(String.format("%02x", octetInt));
             }
             return hexIp.toString();
-        } else if (isHexadecimal(ip)) { // Si la entrada es una cadena hexadecimal, simplemente devuélvela
+        } else if (isHexadecimal(ip)) {
             return ip;
-        } else { // Si la entrada no es válida, lanza una excepción
-            throw new IllegalArgumentException("Formato de entrada no válido para nasIp. Se esperaba una dirección IP o una cadena hexadecimal.");
+        } else {
+            throw new IllegalArgumentException("Invalid input format for nasIp. An IP address or hexadecimal string was expected.");
         }
     }
 
 
-    // Calcula la longitud de un atributo hexadecimal, incluyendo el ID del atributo y el campo de longitud
+    /** Calcula la longitud de un atributo hexadecimal, incluyendo el ID del atributo y el campo de longitud */
     public String calculateLength(String message) {
         String messageWithoutSpaces = message.replace(" ", "");
-        int length = message.length() / 2;                            // Divide por 2 para obtener la longitud en bytes
+        int length = messageWithoutSpaces.length() / 2;                            // Divide por 2 para obtener la longitud en bytes
         length += 2;                                                 // Agrega 2 para incluir el ID del atributo y el campo de longitud
         return String.format("%02x", length);                       // formatea para que queden en pares de byte
     }
 
 
-    // Convierte el User-Name(id q viene por parametro) a hexadecimal con su ID y longitud
+    /** Convierte el User-Name(id q viene por parametro) a hexadecimal con su ID y longitud */
     public String getUserNameHexWithIdAndLength(String userName) throws UnsupportedEncodingException {
         String hexUserName = convertToHex(userName);
         String length = calculateLength(hexUserName);
@@ -140,7 +140,7 @@ public class ConverterHexa {
     }
 
 
-    // Convierte el User-Password(pin - token que vienen por parametro) a hexadecimal con su ID y longitud
+    /** Convierte el User-Password(pin - token que vienen por parametro) a hexadecimal con su ID y longitud */
     public String getUserPasswordHexWithIdAndLength(String user, String password) throws UnsupportedEncodingException {
         String userPassword = user + password;
         String hexUserPassword = convertToHex(userPassword);
@@ -158,7 +158,7 @@ public class ConverterHexa {
     }
 
 
-    // Método para generar un hash MD5
+    /** Método para generar un hash MD5 */
     public String generateMD5(String input) {
         String md5Hash = "";
         try {
@@ -184,7 +184,7 @@ public class ConverterHexa {
     }
 
 
-    // Convierte el NAS-IP-Address a hexadecimal con su ID y longitud
+    /** Convierte el NAS-IP-Address a hexadecimal con su ID y longitud */
     public String getNasIpHexWithIdAndLength(String nasIp) throws UnsupportedEncodingException {
         String hexNasIp = convertIpToHex(nasIp);
         String length = calculateLength(hexNasIp);
@@ -192,7 +192,7 @@ public class ConverterHexa {
     }
 
 
-    // Convierte el NAS-Port a hexadecimal con su ID y longitud
+    /** Convierte el NAS-Port a hexadecimal con su ID y longitud */
     public String getNasPortHexWithIdAndLength(String nasPort) throws UnsupportedEncodingException {
         String hexNasPort = String.format("%08x", Long.parseLong(nasPort)); // rellena con 0 a la izquierda para que tenga 8 caracteres
         String length = calculateLength(hexNasPort);
@@ -200,19 +200,19 @@ public class ConverterHexa {
     }
 
 
-    // Convierte el Request Authenticator a hexadecimal
+    /** Convierte el Request Authenticator a hexadecimal*/
     public String getRequestAuthenticatorHex(String requestAuthenticator) throws UnsupportedEncodingException {
         return convertToHex(requestAuthenticator);
     }
 
 
-    //Formatea una cadena hexadecimal para que cada par de caracteres esté separado por un espacio
+    /** Formatea una cadena hexadecimal para que cada par de caracteres esté separado por un espacio */
     public String formatMessage(String message) {
         return message.replaceAll("..(?!$)", "$0 ");
     }
 
 
-    // Obtiene la longitud de un campo en decimal de las VI
+    /** Obtiene la longitud de un campo en decimal de las VI */
     public int getHexTotalLengthDecimal(String totalLengthHex) {
         return Integer.parseInt(totalLengthHex, 16);
     }
@@ -233,8 +233,7 @@ public class ConverterHexa {
     }
 
 
-
-    // Logea los detalles del mensaje
+    /** Logea los detalles del mensaje */
     private void logMessageDetails(String totalLengthHex,  String completeMessage, String userName, String user, String Password, String nasIp, String nasPort) {
         // Imprime el mensaje completo en hexadecimal
         logger.info(completeMessage);

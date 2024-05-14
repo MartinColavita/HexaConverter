@@ -28,7 +28,7 @@ public class HexaConverterInverse {
 
 
 
-    // Método para convertir una cadena hexadecimal a string
+    /** Método para convertir una cadena hexadecimal a string */
     private String hexToString(String hex) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < hex.length(); i += 2) {
@@ -40,7 +40,7 @@ public class HexaConverterInverse {
     }
 
 
-    // Verifica si una cadena está en hexadecimal
+    /** Verifica si una cadena está en hexadecimal */
     private boolean isHexadecimal(String str) {
         // Elimina los espacios de la cadena antes de verificar si es hexadecimal
         String strWithoutSpaces = str.replace(" ", "");
@@ -57,14 +57,14 @@ public class HexaConverterInverse {
     }
 
 
-    // Convierte de hexadecimal a BigInteger
+    /** Convierte de hexadecimal a BigInteger */
     public BigInteger convertIBigintFromHex(String hex) {
         return new BigInteger(hex, 16);
     }
 
 
 
-    // Convierte una dirección IP de hexadecimal a su formato original
+    /** Convierte una dirección IP de hexadecimal a su formato original */
     public String convertHexToIp(String hexIp) {
         // Verifica si la entrada es una cadena hexadecimal
         if (isHexadecimal(hexIp)) {
@@ -92,7 +92,7 @@ public class HexaConverterInverse {
         }
     }
 
-    // Convierte de hexadecimal a String manteniendo los ceros a la izquierda
+    /** Convierte de hexadecimal a String manteniendo los ceros a la izquierda */
     public String convertHexToStringWithLeadingZeros(String hex) {
         BigInteger bigInt = new BigInteger(hex, 16);
         String result = bigInt.toString();
